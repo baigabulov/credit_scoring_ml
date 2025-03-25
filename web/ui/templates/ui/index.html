@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index Page</title>
+</head>
+<body>
+    <form method="POST" enctype="multipart/form-data">
+        {% if messages %}
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% csrf_token %}
+        <input type="file" name="file">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
