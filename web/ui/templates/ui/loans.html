@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель агента - Заявки</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+        }
+
+        .logout-button {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .accordion-item {
+            border: none;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .accordion-button {
+            background-color: white;
+            padding: 20px;
+            font-weight: 500;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .accordion-body {
+            padding: 30px;
+        }
+
+        .client-info {
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .info-label {
+            width: 150px;
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .scoring-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .scoring-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .scoring-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .scoring-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .scoring-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .final-decision {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .decision-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .status-approved {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            body {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="user-info">
+            {% if request.user.first_name and request.user.last_name %}
+                <div class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+            {% else %}
+                <div class="user-name">{{ request.user.username }}</div>
+            {% endif %}
+            <div class="user-role">Кредитный агент</div>
+        </div>
+
+        <a href="#" class="nav-link active">
+            <i>📊</i> Заявки
+        </a>
+
+        <button class="logout-button" onclick="window.location.href='{% url 'ui:logout_page' %}'">Выйти</button>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Заявки на кредит</h1>
+
+        {% for scoring_request in scoring_requests %}
+        <div class="accordion" id="loanAccordion">
+
+            <!-- Заявка 1 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#loan1">
+                        Заявка {{ scoring_request.id }} - {{ scoring_request.request_data.company_name }} (БИН/ИИН: {{ scoring_request.request_data.company_iin }})
+                    </button>
+                </h2>
+                <div id="loan1" class="accordion-collapse collapse show" data-bs-parent="#loanAccordion">
+                    <div class="accordion-body">
+                        <div class="client-info">
+                            <div class="info-row">
+                                <div class="info-label">ФИО:</div>
+                                <div class="info-value">{{ scoring_request.request_data.manager_name }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Компания:</div>
+                                <div class="info-value">{{ scoring_request.request_data.company_name }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">ИИН/БИН:</div>
+                                <div class="info-value">{{ scoring_request.request_data.company_iin }}</div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">Вид деятельности:</div>
+                                <div class="info-value">{{ scoring_request.get_activity_type }}</div>
+                            </div>
+                        </div>
+
+                        <table class="scoring-table">
+                            <thead>
+                                <tr>
+                                    <th>Параметр</th>
+                                    <th>Модель 1 (PRL)</th>
+                                    <th>Модель 2 (PSML)</th>
+                                    <th>Модель 3 (EMPCC)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Сумма кредита</td>
+                                    <td>{{ scoring_request.request_data.loan_amount }} ₸</td>
+                                    <td>{{ scoring_request.request_data.loan_amount }} ₸</td>
+                                    <td>{{ scoring_request.request_data.loan_amount }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Цель кредита</td>
+                                    <td>{{ scoring_request.get_loan_purpose }}</td>
+                                    <td>{{ scoring_request.get_loan_purpose }}</td>
+                                    <td>{{ scoring_request.get_loan_purpose }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Месячный оборот</td>
+                                    <td>{{ scoring_request.get_monthly_revenue }} ₸</td>
+                                    <td>{{ scoring_request.get_monthly_revenue }} ₸</td>
+                                    <td>{{ scoring_request.get_monthly_revenue }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Годовой оборот</td>
+                                    <td>{{ scoring_request.get_annual_revenue }} ₸</td>
+                                    <td>{{ scoring_request.get_annual_revenue }} ₸</td>
+                                    <td>{{ scoring_request.get_annual_revenue }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Одобренная сумма</td>
+                                    <td>{{ scoring_request.get_rpl_result.approved_amount }} ₸</td>
+                                    <td>{{ scoring_request.get_psml_result.approved_amount }} ₸</td>
+                                    <td>{{ scoring_request.get_empcc_result.approved_amount }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Срок (месяцев)</td>
+                                    <td>{{ scoring_request.get_rpl_result.term }}</td>
+                                    <td>{{ scoring_request.get_psml_result.term }}</td>
+                                    <td>{{ scoring_request.get_empcc_result.term }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ежемесячный платеж</td>
+                                    <td>{{ scoring_request.get_rpl_result.monthly_payment }} ₸</td>
+                                    <td>{{ scoring_request.get_psml_result.monthly_payment }} ₸</td>
+                                    <td>{{ scoring_request.get_empcc_result.monthly_payment }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Процентная ставка</td>
+                                    <td>{{ scoring_request.get_rpl_result.percent }}%</td>
+                                    <td>{{ scoring_request.get_psml_result.percent }}%</td>
+                                    <td>{{ scoring_request.get_empcc_result.percent }}%</td>
+                                </tr>
+                                <tr>
+                                    <td>Переплата</td>
+                                    <td>{{ scoring_request.get_rpl_result.overpayment }} ₸</td>
+                                    <td>{{ scoring_request.get_psml_result.overpayment }} ₸</td>
+                                    <td>{{ scoring_request.get_empcc_result.overpayment }} ₸</td>
+                                </tr>
+                                <tr>
+                                    <td>Статус</td>
+                                    <td><span class="status-badge {% if scoring_request.get_rpl_result.result == 'approved' %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_rpl_result.result == 'approved' %}Одобрено{% else %}Отказано{% endif %}</span></td>
+                                    <td><span class="status-badge {% if scoring_request.get_psml_result.result == 'approved' %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_psml_result.result == 'approved' %}Одобрено{% else %}Отказано{% endif %}</span></td>
+                                    <td><span class="status-badge {% if scoring_request.get_empcc_result.result == 'approved' %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_empcc_result.result == 'approved' %}Одобрено{% else %}Отказано{% endif %}</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="final-decision">
+                            <div class="decision-title">Итоговое решение</div>
+                            <p>Выбранная модель: {% if scoring_request.get_final_result.model %}{{ scoring_request.get_final_result.model }}{% else %}Не выбрана{% endif %}</p>
+                            <p>Статус: <span class="status-badge {% if scoring_request.get_final_result.approved_amount > 0 %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_final_result.approved_amount > 0 %}Одобрено{% else %}Отказано{% endif %}</span></p>
+                            <p>Одобренная сумма: {{ scoring_request.get_final_result.approved_amount }} ₸</p>
+                            <p>Срок: {{ scoring_request.get_final_result.term }} месяцев</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

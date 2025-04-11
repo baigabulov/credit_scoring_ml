@@ -1,19 +1,353 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Index Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Быстрый Бизнес-Кредит - Одобрение за 1 минуту</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-section {
+            display: none;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .form-title {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .file-input-container {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .file-input-container:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #2980b9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .features-section {
+            padding: 80px 0;
+            background-color: white;
+        }
+
+        .feature-card {
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <form method="POST" enctype="multipart/form-data">
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-        {% csrf_token %}
-        <input type="file" name="file">
-        <input type="submit" value="Submit">
-    </form>
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title animate__animated animate__fadeInDown">Получите бизнес-кредит за 1 минуту</h1>
+            <p class="hero-subtitle animate__animated animate__fadeInUp">Быстрое, безопасное и простое решение для финансирования бизнеса</p>
+            <button class="cta-button animate__animated animate__pulse animate__infinite" onclick="showForm()">Подать заявку на кредит</button>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Быстрое одобрение</h3>
+                        <p>Получите одобрение кредита в течение минут, а не дней</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Безопасный процесс</h3>
+                        <p>Ваши данные защищены на уровне банковской безопасности</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>Гибкие условия</h3>
+                        <p>Выберите условия погашения, подходящие для вашего бизнеса</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loanForm" class="form-section">
+        <h2 class="form-title">Форма заявки на кредит</h2>
+        <form id="applicationForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="companyIIN">ИИН/БИН компании</label>
+                        <input type="text" name="companyIIN" class="form-control" id="companyIIN" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="companyName">Название компании</label>
+                        <input type="text" name="companyName" class="form-control" id="companyName" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="managerName">ФИО руководителя</label>
+                        <input type="text" name="managerName" class="form-control" id="managerName" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="managerIIN">ИИН руководителя</label>
+                        <input type="text" name="managerIIN" class="form-control" id="managerIIN" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="activityType">Вид деятельности</label>
+                <select name="activityType" class="form-control" id="activityType" required>
+                    {% for key, value in activity_type_choices.items %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="loanAmount">Сумма кредита</label>
+                <input type="number" name="loanAmount" class="form-control" id="loanAmount" required>
+            </div>
+
+            <div class="form-group">
+                <label for="loanPurpose">Цель кредита</label>
+                <select name="loanPurpose" class="form-control" id="loanPurpose" required>
+                    {% for key, value in loan_purpose_choices.items %}
+                        <option value="{{ key }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Банковские выписки</label>
+                <div class="file-input-container" id="fileDropZone">
+                    <p>Перетащите сюда ваши банковские выписки или нажмите для выбора файлов</p>
+                    <p class="text-muted">Поддерживаемые форматы: PDF, DOCX, TXT</p>
+                    <input type="file" name="bankStatements" id="bankStatements" multiple accept=".pdf,.docx,.txt" style="display: none;">
+                </div>
+                <div id="fileList" class="mt-2"></div>
+            </div>
+
+            <button type="submit" class="submit-button">Отправить заявку</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showForm() {
+            const form = document.getElementById('loanForm');
+            form.classList.add('show');
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // File upload handling
+        const fileDropZone = document.getElementById('fileDropZone');
+        const fileInput = document.getElementById('bankStatements');
+        const fileList = document.getElementById('fileList');
+
+        fileDropZone.addEventListener('click', () => fileInput.click());
+
+        fileDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileDropZone.style.borderColor = '#3498db';
+        });
+
+        fileDropZone.addEventListener('dragleave', () => {
+            fileDropZone.style.borderColor = '#ddd';
+        });
+
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.style.borderColor = '#ddd';
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            fileList.innerHTML = '';
+            Array.from(files).forEach(file => {
+                if (file.type === 'application/pdf' || 
+                    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
+                    file.type === 'text/plain') {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'alert alert-info';
+                    fileItem.innerHTML = `
+                        ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+                        <button type="button" class="btn-close float-end" onclick="this.parentElement.remove()"></button>
+                    `;
+                    fileList.appendChild(fileItem);
+                }
+            });
+        }
+
+        // Form submission handling
+        document.getElementById('applicationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Here you would typically send the form data to your backend
+            const form = e.target;
+            const formData = new FormData(form);
+
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Отправка...';
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response;
+            })
+            .then(response => {
+                // Follow the redirect from the backend
+                window.location.href = response.url;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Show error message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger';
+                alertDiv.textContent = 'Произошла ошибка при отправке формы. Пожалуйста, попробуйте снова.';
+                form.insertBefore(alertDiv, form.firstChild);
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalText;
+            });
+        });
+    </script>
 </body>
 </html>

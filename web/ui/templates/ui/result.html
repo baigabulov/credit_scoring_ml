@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результат рассмотрения заявки</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .result-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounceIn 1s;
+        }
+
+        .result-title {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .result-subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 30px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .details-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .details-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .details-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .cta-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 30px 0;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .faq-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .faq-title {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .faq-question {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            padding: 15px;
+            background-color: white;
+            display: none;
+        }
+
+        .faq-answer.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .status-approved {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="result-header">
+            <div class="result-icon" id="resultIcon">{% if scoring_request.get_final_result.approved_amount > 0 %}✅{% else %}❌{% endif %}</div>
+            <h1 class="result-title" id="resultTitle">{% if scoring_request.get_final_result.approved_amount > 0 %}Поздравляем!{% else %}К сожалению, ваша заявка на кредит не была одобрена{% endif %}</h1>
+            <p class="result-subtitle" id="resultSubtitle">{% if scoring_request.get_final_result.approved_amount > 0 %}Ваша заявка на кредит одобрена{% else %}Мы сожалеем, что ваша заявка на кредит не была одобрена{% endif %}</p>
+        </div>
+
+        <table class="details-table">
+            <tr>
+                <th colspan="2">Информация о заявителе</th>
+            </tr>
+            <tr>
+                <td>ФИО</td>
+                <td id="applicantName">{{ scoring_request.request_data.manager_name }}</td>
+            </tr>
+            <tr>
+                <td>Компания</td>
+                <td id="companyName">{{ scoring_request.request_data.company_name }}</td>
+            </tr>
+            <tr>
+                <td>Вид деятельности</td>
+                <td id="activityType">{{ scoring_request.request_data.activity_type }}</td>
+            </tr>
+            <tr>
+                <th colspan="2">Детали кредита</th>
+            </tr>
+            <tr>
+                <td>Цель кредита</td>
+                <td id="loanPurpose">{{ scoring_request.request_data.loan_purpose }}</td>
+            </tr>
+            <tr>
+                <td>Сумма кредита</td>
+                <td id="loanAmount">{{ scoring_request.request_data.loan_amount }} ₸</td>
+            </tr>
+            <tr>
+                <td>Срок</td>
+                <td id="loanTerm">{{ scoring_request.get_final_result.term }} месяцев</td>
+            </tr>
+            <tr id="monthlyPaymentRow">
+                <td>Ежемесячный платеж</td>
+                <td id="monthlyPayment">{{ scoring_request.get_final_result.monthly_payment }} ₸</td>
+            </tr>
+            <tr id="overpaymentRow">
+                <td>Общая переплата</td>
+                <td id="overpayment">{{ scoring_request.get_final_result.overpayment }} ₸</td>
+            </tr>
+            <tr id="statusRow">
+                <td>Статус</td>
+                <td><span class="status-badge {% if scoring_request.get_final_result.approved_amount > 0 %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_final_result.approved_amount > 0 %}Одобрено{% else %}Отказано{% endif %}</span></td>
+            </tr>
+        </table>
+
+        <a href="{% url 'ui:index_page' %}" class="cta-button">Подать новую заявку</a>
+
+        <div class="faq-section">
+            <h2 class="faq-title">Часто задаваемые вопросы</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Какие документы нужны для подачи заявки на кредит?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Вам потребуются документы о регистрации компании, банковские выписки за последние 6 месяцев и документы, удостоверяющие личность руководства компании.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Сколько времени занимает процесс одобрения?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Процесс одобрения обычно занимает 1-2 минуты. В некоторых случаях может потребоваться больше времени, если необходимы дополнительные документы.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Какие процентные ставки?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Процентные ставки варьируются в зависимости от суммы кредита, срока и кредитной истории вашей компании. Наши ставки конкурентоспособны и прозрачны.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Можно ли досрочно погасить кредит?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Да, вы можете досрочно погасить кредит без штрафных санкций. Досрочное погашение может даже уменьшить общую сумму выплачиваемых процентов.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    Что происходит, если я пропущу платеж?
+                    <span>▼</span>
+                </div>
+                <div class="faq-answer">
+                    Мы понимаем, что у бизнеса могут быть временные трудности. Пожалуйста, немедленно свяжитесь с нашей службой поддержки, если вы ожидаете проблем с платежами. Мы предлагаем гибкие решения для управления платежами.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle FAQ answers
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const arrow = element.querySelector('span');
+            
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+                arrow.textContent = '▼';
+            } else {
+                answer.classList.add('show');
+                arrow.textContent = '▲';
+            }
+        }
+
+        // Function to set the result status (approved or rejected)
+        function setResultStatus(isApproved) {
+            const icon = document.getElementById('resultIcon');
+            const title = document.getElementById('resultTitle');
+            const subtitle = document.getElementById('resultSubtitle');
+            const monthlyPaymentRow = document.getElementById('monthlyPaymentRow');
+            const overpaymentRow = document.getElementById('overpaymentRow');
+            const statusRow = document.getElementById('statusRow');
+            const rejectionReasonRow = document.getElementById('rejectionReasonRow');
+
+            if (isApproved) {
+                icon.textContent = '✅';
+                icon.style.color = 'var(--success-color)';
+                title.textContent = 'Поздравляем!';
+                subtitle.textContent = 'Ваша заявка на кредит одобрена';
+                monthlyPaymentRow.style.display = '';
+                overpaymentRow.style.display = '';
+                statusRow.style.display = '';
+                rejectionReasonRow.style.display = 'none';
+            } else {
+                icon.textContent = '❌';
+                icon.style.color = 'var(--danger-color)';
+                title.textContent = 'Заявка не одобрена';
+                subtitle.textContent = 'Мы сожалеем, что ваша заявка на кредит не была одобрена';
+                monthlyPaymentRow.style.display = 'none';
+                overpaymentRow.style.display = 'none';
+                statusRow.querySelector('.status-badge').className = 'status-badge status-rejected';
+                statusRow.querySelector('.status-badge').textContent = 'Отклонено';
+                rejectionReasonRow.style.display = '';
+            }
+        }
+
+        // Example: Set the result status (you would get this from your backend)
+        // setResultStatus(false); // For rejected application
+        // setResultStatus(true); // For approved application
+    </script>
+</body>
+</html>
