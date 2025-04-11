@@ -17,7 +17,7 @@ class Scorer:
         
         percent = random.randint(1, 16)
         monthly_payment = round(approved_amount * (1 + percent / 100) / term, 2)
-        is_approved = (approved_amount / self.scoring_request.request_data['loan_amount']) > 0.4
+        is_approved = round(approved_amount / float(self.scoring_request.request_data['loan_amount']), 2) > 0.4
 
         if not state:
             self.scoring_request.request_data['state'] = 1
