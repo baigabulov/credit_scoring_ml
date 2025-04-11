@@ -42,13 +42,13 @@ class ScoringRequest(models.Model):
         (LOAN_PURPOSE_OTHER, 'Другое'),
     ]
 
-    MODEL_PRL = 'RPL'
-    MODEL_PSML = 'PSML'
-    MODEL_EMPCC = 'EMPCC'
+    MODEL_PRL = 'DECISION_TREE'
+    MODEL_PSML = 'SVM'
+    MODEL_EMPCC = 'SNN'
     MODEL_CHOICES = [
-        (MODEL_PRL, 'PRL'),
-        (MODEL_PSML, 'PSML'),
-        (MODEL_EMPCC, 'EMPCC'),
+        (MODEL_PRL, 'DECISION_TREE'),
+        (MODEL_PSML, 'SMV'),
+        (MODEL_EMPCC, 'SNN'),
     ]
 
     tokenized_data = models.TextField()
