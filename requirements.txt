@@ -4,6 +4,10 @@ tiktoken==0.9.0
 python-docx==1.1.2
 pydantic==2.10.6
 PyMuPDF==1.25.5
+pandas
+numpy
+scikit-learn
+joblib
 
 # Dev tools
 ipython

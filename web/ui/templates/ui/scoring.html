@@ -164,7 +164,11 @@
         function checkApplicationStatus() {
             if (!applicationId) return;
 
-            fetch(`/scoring/status/${applicationId}/`)
+            fetch(`/scoring/status/${applicationId}/`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'done') {

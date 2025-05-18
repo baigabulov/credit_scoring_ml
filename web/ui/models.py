@@ -44,11 +44,11 @@ class ScoringRequest(models.Model):
 
     MODEL_PRL = 'DECISION_TREE'
     MODEL_PSML = 'SVM'
-    MODEL_EMPCC = 'SNN'
+    MODEL_EMPCC = 'LINEAR_REGRESSION'
     MODEL_CHOICES = [
         (MODEL_PRL, 'DECISION_TREE'),
         (MODEL_PSML, 'SMV'),
-        (MODEL_EMPCC, 'SNN'),
+        (MODEL_EMPCC, 'LINEAR_REGRESSION'),
     ]
 
     tokenized_data = models.TextField()
@@ -85,22 +85,20 @@ class ScoringRequest(models.Model):
 
     def get_rpl_result(self):
         if self.id == 32:
-            print('RPL', self.request_data)
             return {}
-        if not self.request_data or not self.request_data.get('RPL'):
+        if not self.request_data or not self.request_data.get(self.MODEL_PRL):
             return {}
-        print('RPL', self.request_data.get('RPL'))
-        return self.request_data.get('RPL')
+        return self.request_data.get(self.MODEL_PRL)
     
     def get_psml_result(self):
-        if not self.request_data or not self.request_data.get('PSML'):
+        if not self.request_data or not self.request_data.get(self.MODEL_PSML):
             return {}
-        return self.request_data.get('PSML')
+        return self.request_data.get(self.MODEL_PSML)
     
     def get_empcc_result(self):
-        if not self.request_data or not self.request_data.get('EMPCC'):
+        if not self.request_data or not self.request_data.get(self.MODEL_EMPCC):
             return {}
-        return self.request_data.get('EMPCC')
+        return self.request_data.get(self.MODEL_EMPCC)
     
     def get_final_result(self):
         if not self.request_data or not self.request_data.get('result'):

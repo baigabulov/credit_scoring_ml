@@ -193,14 +193,14 @@
             </tr>
             <tr>
                 <td>Вид деятельности</td>
-                <td id="activityType">{{ scoring_request.request_data.activity_type }}</td>
+                <td id="activityType">{{ scoring_request.get_activity_type }}</td>
             </tr>
             <tr>
                 <th colspan="2">Детали кредита</th>
             </tr>
             <tr>
                 <td>Цель кредита</td>
-                <td id="loanPurpose">{{ scoring_request.request_data.loan_purpose }}</td>
+                <td id="loanPurpose">{{ scoring_request.get_loan_purpose }}</td>
             </tr>
             <tr>
                 <td>Сумма кредита</td>
