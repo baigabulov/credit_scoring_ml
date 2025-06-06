@@ -1,5 +1,8 @@
 import random
 import json
+from django.utils import timezone
+from datetime import datetime
+
 from ui.models import ScoringRequest
 from scoring.model_learning import DecisionTreeTraining, SVMTraining, LinearRegressionTraining
 
@@ -44,6 +47,15 @@ class Scorer:
         if self.scoring_request.status == ScoringRequest.STATUS_DONE:
             return ScoringRequest.STATUS_DONE
         
+        start_time = self.scoring_request.request_data.get('start_time')
+        if not start_time:
+            start_time = timezone.now()
+        
+        if isinstance(start_time, str):
+            start_time = datetime.fromisoformat(start_time)
+
+        self.scoring_request.request_data['start_time'] = start_time.isoformat()
+        self.scoring_request.save(update_fields=['request_data'])
         state = self.scoring_request.request_data.get('state', None)
         data = self.prepare_data()
         
@@ -116,4 +128,10 @@ class Scorer:
         }
         self.scoring_request.status = ScoringRequest.STATUS_DONE
         self.scoring_request.save(update_fields=['status', 'request_data'])
+
+        end_time = timezone.now()
+        self.scoring_request.request_data['end_time'] = end_time.isoformat()
+        time_spent = end_time - start_time
+        self.scoring_request.request_data['time_spent'] = time_spent.total_seconds()
+        self.scoring_request.save(update_fields=['request_data'])
         return ScoringRequest.STATUS_DONE

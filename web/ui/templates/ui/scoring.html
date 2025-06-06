@@ -92,6 +92,13 @@
             animation: fadeIn 1s ease-out;
         }
 
+        .timer {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
         .loading-dots {
             display: inline-block;
             animation: dots 1.5s infinite;
@@ -139,15 +146,29 @@
         <p class="loading-message">
             <span id="statusMessage">Собираем данные</span><span class="loading-dots"></span>
         </p>
+        <p class="timer">
+            Прошло времени: <span id="elapsedTime">0</span> сек
+        </p>
     </div>
 
     <script>
         let progress = 0;
+        let seconds = 0;
         const progressBar = document.querySelector('.progress-bar');
         const progressText = document.querySelector('.progress-text');
         const loadingDots = document.querySelector('.loading-dots');
         const statusMessage = document.getElementById('statusMessage');
+        const elapsedTime = document.getElementById('elapsedTime');
         let applicationId = document.getElementById('applicationId').textContent;
+
+        // Timer function
+        function updateTimer() {
+            seconds++;
+            elapsedTime.textContent = seconds;
+        }
+
+        // Start the timer
+        const timerInterval = setInterval(updateTimer, 1000);
 
         function updateStatusMessage(progress) {
             if (progress < 30) {
@@ -172,7 +193,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'done') {
-                        window.location.href = `/result/${applicationId}/`;
+                        clearInterval(timerInterval); // Stop the timer when done
+                        window.location.href = `/result/${applicationId}/?time_spent=${seconds}`;
                     } else if (data.status === 'processing') {
                         statusMessage.textContent = 'Подождите пару минут, принимаем окончательное решение';
                         setTimeout(checkApplicationStatus, 5000);
@@ -191,14 +213,12 @@
                 progressText.textContent = `${progress}%`;
                 updateStatusMessage(progress);
                 
-                // Simulate varying speeds of progress
                 const delay = progress < 30 ? 100 : 
                              progress < 70 ? 150 : 
                              progress < 90 ? 200 : 300;
                 
                 setTimeout(updateProgress, delay);
             } else {
-                // Start checking the application status
                 checkApplicationStatus();
             }
         }

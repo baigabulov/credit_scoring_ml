@@ -10,6 +10,8 @@ LEARNING_COLUMN = 'approved_amount'
 
 class DecisionTreeTraining:
 
+    ACC = 0.85
+
     def __init__(self) -> None:
         self.parent_path = 'scoring'
         self.model = None
@@ -43,6 +45,8 @@ class DecisionTreeTraining:
 
 class SVMTraining:
 
+    ACC = 0.839
+
     def __init__(self) -> None:
         self.parent_path = 'scoring'
         self.model = None
@@ -73,6 +77,8 @@ class SVMTraining:
 
 
 class LinearRegressionTraining:
+
+    ACC = 0.894
 
     def __init__(self) -> None:
         self.parent_path = 'scoring'

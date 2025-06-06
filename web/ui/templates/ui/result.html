@@ -218,6 +218,12 @@
                 <td>Общая переплата</td>
                 <td id="overpayment">{{ scoring_request.get_final_result.overpayment }} ₸</td>
             </tr>
+            {% if scoring_request.request_data.time_spent %}
+                <tr id="timeSpentRow">
+                    <td>Время рассмотрения</td>
+                    <td id="timeSpent">{{ scoring_request.request_data.time_spent }} сек</td>
+                </tr>
+            {% endif %}
             <tr id="statusRow">
                 <td>Статус</td>
                 <td><span class="status-badge {% if scoring_request.get_final_result.approved_amount > 0 %}status-approved{% else %}status-rejected{% endif %}">{% if scoring_request.get_final_result.approved_amount > 0 %}Одобрено{% else %}Отказано{% endif %}</span></td>

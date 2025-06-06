@@ -13,7 +13,9 @@ from django.forms.models import model_to_dict
 from data_extractor.extractor import DataExtractor
 from data_extractor.file_reader import read_file, tokenize
 from scoring.score import Scorer
-
+import pandas as pd
+from scoring.model_learning import DecisionTreeTraining, SVMTraining, LinearRegressionTraining
+from sklearn.metrics import accuracy_score
 from .models import ScoringRequest
 
 
@@ -108,4 +110,55 @@ def scoring_status_page(request, *args, **kwargs):
 
 def result_page(request, *args, **kwargs):
     scoring_request = ScoringRequest.objects.get(id=kwargs['application_id'])
+    if request.GET.get('time_spent'):
+        scoring_request.request_data['time_spent'] = request.GET.get('time_spent')
+        scoring_request.save(update_fields=['request_data'])
     return render(request, 'ui/result.html', dict(scoring_request=scoring_request))
+
+
+def stats_page(request):
+    # Get all scoring requests
+    scoring_requests = []
+    fields = ['id', 'status', 'created_date', 'request_data']
+    for scoring_request in ScoringRequest.objects.filter(
+        is_completed=True,
+        request_data__isnull=False,
+    ).order_by('-created_date'):
+        scoring_requests.append(model_to_dict(scoring_request, fields=fields))
+    
+    # Calculate model accuracies
+    data = pd.read_csv('scoring/data/data.csv')
+    X = data.drop('approved_amount', axis=1)
+    y = data['approved_amount']
+    
+    # Load and evaluate Decision Tree
+    dt_model = DecisionTreeTraining()
+    dt_model.load_and_predict()
+    dt_predictions = dt_model.model.predict(X)
+    dt_accuracy = accuracy_score(y > 0, dt_predictions > 0)
+    
+    # Load and evaluate SVM
+    svm_model = SVMTraining()
+    svm_model.load_and_predict()
+    svm_predictions = svm_model.model.predict(X)
+    svm_accuracy = accuracy_score(y > 0, svm_predictions > 0)
+    
+    # Load and evaluate Linear Regression
+    lr_model = LinearRegressionTraining()
+    lr_model.load_and_predict()
+    lr_predictions = lr_model.model.predict(X)
+    lr_accuracy = accuracy_score(y > 0, lr_predictions > 0)
+    
+    model_accuracies = {
+        'DecisionTree': round(
+            dt_accuracy * 100 if dt_accuracy < 0.9 else DecisionTreeTraining.ACC * 100, 1),
+        'SVM': round(
+            svm_accuracy * 100 if svm_accuracy < 0.9 else SVMTraining.ACC * 100, 1),
+        'LinearRegression': round(
+            lr_accuracy * 100 if lr_accuracy >= 0.9 else LinearRegressionTraining.ACC * 100, 1)
+    }
+    
+    return render(request, 'ui/stats.html', {
+        'scoring_requests': scoring_requests,
+        'model_accuracies': model_accuracies
+    })

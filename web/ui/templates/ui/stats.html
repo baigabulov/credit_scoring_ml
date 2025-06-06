@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика заявок</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .user-name {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+        }
+
+        .logout-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+        }
+
+        .stats-container {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .stats-title {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+            }
+
+            body {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="user-info">
+            {% if request.user.first_name and request.user.last_name %}
+                <div class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+            {% else %}
+                <div class="user-name">{{ request.user.username }}</div>
+            {% endif %}
+            <div class="user-role">Кредитный агент</div>
+        </div>
+
+        <a href="{% url 'ui:loans_page' %}" class="nav-link">
+            <i>📊</i> Заявки
+        </a>
+
+        <a href="{% url 'ui:stats_page' %}" class="nav-link active">
+            <i>📈</i> Статистика
+        </a>
+
+        <button class="logout-button" onclick="window.location.href='{% url 'ui:logout_page' %}'">Выйти</button>
+    </div>
+
+    <div class="stats-container">
+        <h1 class="stats-title">Статистика заявок</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h3 class="chart-title">Точность моделей</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Модель</th>
+                                <th>Точность</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Decision Tree</td>
+                                <td>{{ model_accuracies.DecisionTree }}%</td>
+                            </tr>
+                            <tr>
+                                <td>SVM</td>
+                                <td>{{ model_accuracies.SVM }}%</td>
+                            </tr>
+                            <tr>
+                                <td>Linear Regression</td>
+                                <td>{{ model_accuracies.LinearRegression }}%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h3 class="chart-title">Одобренные заявки</h3>
+                    <canvas id="approvedRequestsChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h3 class="chart-title">Общая сумма одобренных займов</h3>
+                    <canvas id="totalAmountChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Prepare data from Django template
+        const scoringRequests = {{ scoring_requests|safe }};
+        console.log(scoringRequests, 'here');
+        // Calculate statistics
+        const totalRequests = scoringRequests.length;
+        const approvedRequests = scoringRequests.filter(req => req.request_data?.result?.approved_amount > 0).length;
+        
+        // Calculate total amounts
+        const approvedAmount = scoringRequests
+            .filter(req => req.request_data?.result?.approved_amount > 0)
+            .reduce((sum, req) => sum + (req.request_data?.result?.approved_amount || 0), 0);
+
+        const totalAmount = scoringRequests
+            .reduce((sum, req) => sum + (parseInt(req.request_data?.loan_amount) || 0), 0);
+
+        const rejectedAmount = parseInt(totalAmount) - parseInt(approvedAmount);
+        console.log(rejectedAmount, 'rejectedAmount');
+        console.log(totalAmount, 'totalAmount');
+        // Chart configurations
+        const chartConfig = {
+            type: 'doughnut',
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        };
+
+        // Approved Requests Chart
+        new Chart(
+            document.getElementById('approvedRequestsChart'),
+            {
+                ...chartConfig,
+                data: {
+                    labels: ['Одобрено', 'Отклонено'],
+                    datasets: [{
+                        data: [approvedRequests, totalRequests - approvedRequests],
+                        backgroundColor: ['#2ecc71', '#e74c3c'],
+                        borderWidth: 0
+                    }]
+                }
+            }
+        );
+
+        // Total Amount Chart
+        new Chart(
+            document.getElementById('totalAmountChart'),
+            {
+                ...chartConfig,
+                data: {
+                    labels: ['Одобрено', 'Отклонено'],
+                    datasets: [{
+                        data: [approvedAmount, rejectedAmount],
+                        backgroundColor: ['#2ecc71', '#e74c3c'],
+                        borderWidth: 0
+                    }]
+                }
+            }
+        );
+    </script>
+</body>
+</html> 
